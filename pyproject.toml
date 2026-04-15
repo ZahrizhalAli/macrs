@@ -1,0 +1,11 @@
+[project]
+name = "macrs"
+version = "0.1.0"
+description = "Multi-Agent Conversational Recommender System"
+requires-python = ">=3.10"
+dependencies = [
+    "litellm>=1.0.0",
+]
+
+[project.scripts]
+macrs = "macrs.main:main"
