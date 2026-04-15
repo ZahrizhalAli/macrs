@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 from macrs.agents.asking import AskingAgent
 from macrs.agents.chitchat import ChitChatAgent
@@ -38,13 +38,14 @@ class MACRSEngine:
     def turn(self, user_input: str) -> TurnResult:
         """Process one user message and return the system's chosen response."""
         self.history.add("user", user_input)
-        catalog_text = self.catalog.as_text()
 
-        # Step 1: All three responder agents generate candidates
+        # Step 1: All three responder agents generate candidates.
+        # Recommending agent gets the catalog so it can call search_movies.
+        # Asking and chitchat don't need the catalog — they don't recommend items.
         candidates = [
-            self.asking.generate(self.history, self.user_profile, catalog_text),
-            self.recommending.generate(self.history, self.user_profile, catalog_text),
-            self.chitchat.generate(self.history, self.user_profile, catalog_text),
+            self.asking.generate(self.history, self.user_profile),
+            self.recommending.generate(self.history, self.user_profile, self.catalog),
+            self.chitchat.generate(self.history, self.user_profile),
         ]
 
         # Step 2: Planner selects the best candidate
