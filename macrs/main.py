@@ -5,6 +5,8 @@ from __future__ import annotations
 import argparse
 import sys
 
+from dotenv import load_dotenv
+
 from macrs.catalog import Item, ItemCatalog
 from macrs.config import LLMConfig
 from macrs.engine import MACRSEngine
@@ -25,6 +27,8 @@ def sample_movie_catalog() -> ItemCatalog:
 
 
 def main() -> None:
+    load_dotenv()
+
     parser = argparse.ArgumentParser(description="MACRS — Multi-Agent Conversational Recommender")
     parser.add_argument("--model", default="gpt-4o-mini", help="LiteLLM model string (default: gpt-4o-mini)")
     parser.add_argument("--verbose", action="store_true", help="Show all candidate responses before the chosen one")
