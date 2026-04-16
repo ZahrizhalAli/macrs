@@ -39,17 +39,22 @@ class PlannerAgent:
         candidates: list[CandidateResponse],
         history: DialogueHistory,
         user_profile: UserProfile,
+        planner_correction: str = "",
     ) -> CandidateResponse:
         candidate_text = "\n\n".join(
             f"### {c.agent_name} response\n{c.content}" for c in candidates
         )
 
-        user_msg = (
-            f"## User Profile\n{user_profile.summary()}\n\n"
-            f"## Dialogue History (last 10 turns)\n{history.format(last_n=10)}\n\n"
-            f"## Candidate Responses\n{candidate_text}\n\n"
-            "Choose the best candidate."
-        )
+        parts = [
+            f"## User Profile\n{user_profile.summary()}",
+            f"\n## Dialogue History (last 10 turns)\n{history.format(last_n=10)}",
+            f"\n## Candidate Responses\n{candidate_text}",
+        ]
+        if planner_correction:
+            parts.append(f"\n## Corrective Experience (from reflection)\n{planner_correction}")
+        parts.append("\nChoose the best candidate.")
+
+        user_msg = "\n".join(parts)
 
         resp = completion(
             model=self.llm_config.model,

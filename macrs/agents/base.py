@@ -30,8 +30,9 @@ class ResponderAgent:
         history: DialogueHistory,
         user_profile: UserProfile,
         catalog: ItemCatalog | None = None,
+        strategy_hint: str = "",
     ) -> CandidateResponse:
-        system = self._build_system(user_profile)
+        system = self._build_system(user_profile, strategy_hint)
         messages: list[dict] = [{"role": "system", "content": system}]
         for m in history.messages:
             messages.append({"role": m.role, "content": m.content})
@@ -90,9 +91,11 @@ class ResponderAgent:
         content = resp.choices[0].message.content or ""
         return CandidateResponse(agent_name=self.agent_name, content=content.strip())
 
-    def _build_system(self, user_profile: UserProfile) -> str:
+    def _build_system(self, user_profile: UserProfile, strategy_hint: str = "") -> str:
         parts = [
             self.system_prompt,
             f"\n## User Profile\n{user_profile.summary()}",
         ]
+        if strategy_hint:
+            parts.append(f"\n## Strategy Guidance (from reflection)\n{strategy_hint}")
         return "\n".join(parts)
